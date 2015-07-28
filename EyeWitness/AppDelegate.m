@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "SCLAlertView.h"
 @import GoogleMaps;
 
 @interface AppDelegate ()

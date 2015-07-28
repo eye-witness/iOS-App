@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>6211721B-F088-444E-B767-6FB66615BB44</string>
+	<key>IDESourceControlProjectName</key>
+	<string>EyeWitness</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>9664473F4054F4860F6C6D1930020E7E35F46C9C</key>
+		<string>https://github.com/eye-witness/iOS-App.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>EyeWitness.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>9664473F4054F4860F6C6D1930020E7E35F46C9C</key>
+		<string>..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/eye-witness/iOS-App.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>9664473F4054F4860F6C6D1930020E7E35F46C9C</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>9664473F4054F4860F6C6D1930020E7E35F46C9C</string>
+			<key>IDESourceControlWCCName</key>
+			<string>eyeWitness</string>
+		</dict>
+	</array>
+</dict>
+</plist>

@@ -14,5 +14,7 @@
 @property (strong, nonatomic) IBOutlet UILabel *description;
 @property (strong, nonatomic) IBOutlet UILabel *location;
 
-@property (strong, nonatomic) IBOutlet UIButton *share;
+@property (strong, nonatomic) IBOutlet UIButton *close;
+@property (strong, nonatomic) IBOutlet UIButton *report;
+
 @end

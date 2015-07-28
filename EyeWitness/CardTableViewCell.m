@@ -9,7 +9,7 @@
 #import "CardTableViewCell.h"
 
 @implementation CardTableViewCell
-@synthesize MapViewCircle, title, description, location;
+@synthesize MapViewCircle, title, description, location, close, report;
 
 - (void)awakeFromNib {
     // Initialization code

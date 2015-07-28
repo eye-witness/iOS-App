@@ -10,10 +10,14 @@
 
 @interface ViewController : UIViewController <UITableViewDataSource, UITableViewDelegate> {
     IBOutlet UITableView *cardTableView;
-    NSArray *titles;
-    NSArray *descriptions;
-    NSArray *locations;
-    NSArray *cellBackgroundColours;
+    NSMutableArray *titles;
+    NSMutableArray *descriptions;
+    NSMutableArray *locations;
+    NSMutableArray *cellBackgroundColours;
+    NSMutableArray *longitude;
+    NSMutableArray *latitude;
+    NSMutableArray *phoneNumbers;
+    NSMutableArray *policeForces;
     int selectedIndex;
 }
 
