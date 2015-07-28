@@ -12,6 +12,8 @@
 		05E522CF1B679B2000163C20 /* SCLAlertViewStyleKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 05E522C71B679B2000163C20 /* SCLAlertViewStyleKit.m */; };
 		05E522D01B679B2000163C20 /* SCLButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 05E522C91B679B2000163C20 /* SCLButton.m */; };
 		05E522D11B679B2000163C20 /* UIImage+ImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = 05E522CC1B679B2000163C20 /* UIImage+ImageEffects.m */; };
+		05E522D31B67CEB500163C20 /* 256 EyeWitness Logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 05E522D21B67CEB500163C20 /* 256 EyeWitness Logo.png */; };
+		05E522D51B67D4C100163C20 /* title.png in Resources */ = {isa = PBXBuildFile; fileRef = 05E522D41B67D4C100163C20 /* title.png */; };
 		05FE99401B675BFB00B04586 /* CardTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05FE993D1B675BFB00B04586 /* CardTableViewCell.xib */; };
 		05FE99411B675BFB00B04586 /* CardTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 05FE993F1B675BFB00B04586 /* CardTableViewCell.m */; };
 		05FE99441B677A5D00B04586 /* testImage.png in Resources */ = {isa = PBXBuildFile; fileRef = 05FE99431B677A5D00B04586 /* testImage.png */; };
@@ -48,6 +50,8 @@
 		05E522CA1B679B2000163C20 /* SCLMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCLMacros.h; sourceTree = "<group>"; };
 		05E522CB1B679B2000163C20 /* UIImage+ImageEffects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+ImageEffects.h"; sourceTree = "<group>"; };
 		05E522CC1B679B2000163C20 /* UIImage+ImageEffects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ImageEffects.m"; sourceTree = "<group>"; };
+		05E522D21B67CEB500163C20 /* 256 EyeWitness Logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "256 EyeWitness Logo.png"; sourceTree = "<group>"; };
+		05E522D41B67D4C100163C20 /* title.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = title.png; sourceTree = "<group>"; };
 		05FE993D1B675BFB00B04586 /* CardTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CardTableViewCell.xib; sourceTree = "<group>"; };
 		05FE993E1B675BFB00B04586 /* CardTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CardTableViewCell.h; sourceTree = "<group>"; };
 		05FE993F1B675BFB00B04586 /* CardTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CardTableViewCell.m; sourceTree = "<group>"; };
@@ -111,7 +115,6 @@
 		05FE99421B675C0100B04586 /* Card */ = {
 			isa = PBXGroup;
 			children = (
-				05FE99431B677A5D00B04586 /* testImage.png */,
 				05FE993D1B675BFB00B04586 /* CardTableViewCell.xib */,
 				05FE993F1B675BFB00B04586 /* CardTableViewCell.m */,
 				05FE993E1B675BFB00B04586 /* CardTableViewCell.h */,
@@ -157,6 +160,9 @@
 				A78D69141B66B9D600823E49 /* ViewController.h */,
 				A78D69151B66B9D600823E49 /* ViewController.m */,
 				A78D69171B66B9D600823E49 /* Main.storyboard */,
+				05E522D41B67D4C100163C20 /* title.png */,
+				05E522D21B67CEB500163C20 /* 256 EyeWitness Logo.png */,
+				05FE99431B677A5D00B04586 /* testImage.png */,
 				05FE99421B675C0100B04586 /* Card */,
 				A78D691A1B66B9D600823E49 /* Images.xcassets */,
 				A78D691C1B66B9D600823E49 /* LaunchScreen.xib */,
@@ -286,7 +292,9 @@
 				A78D691E1B66B9D600823E49 /* LaunchScreen.xib in Resources */,
 				05FE99401B675BFB00B04586 /* CardTableViewCell.xib in Resources */,
 				05FE99441B677A5D00B04586 /* testImage.png in Resources */,
+				05E522D31B67CEB500163C20 /* 256 EyeWitness Logo.png in Resources */,
 				A78D691B1B66B9D600823E49 /* Images.xcassets in Resources */,
+				05E522D51B67D4C100163C20 /* title.png in Resources */,
 				A78D69391B66BA8900823E49 /* Entitlements.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

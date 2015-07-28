@@ -36,6 +36,10 @@
     myBox.backgroundColor = [UIColor colorWithRed:((float)66 / 255.0f) green:((float)133 / 255.0f) blue:((float)244 / 255.0f) alpha:1.0f];
     [self.view addSubview:myBox];
     
+    UIImageView *EyeWitnessLogo256 = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.bounds.size.width / 2) - 160, 10, 320, 40)];
+    EyeWitnessLogo256.image = [UIImage imageNamed:@"title.png"];
+    [myBox addSubview:EyeWitnessLogo256];
+    
     UIView *myBox2  = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 20)];
     myBox2.backgroundColor = [UIColor colorWithRed:((float)51 / 255.0f) green:((float)103 / 255.0f) blue:((float)214 / 255.0f) alpha:1.0f];
     [self.view addSubview:myBox2];
@@ -142,8 +146,6 @@
             
             [cell.close addTarget:self action:@selector(dismiss) forControlEvents:UIControlEventTouchUpInside];
             
-            //[self reportWithPhoneNumber:[[phoneNumbers objectAtIndex:((indexPath.row - 1) / 2)] intValue] andPoliceForce:[[policeForces objectAtIndex:((indexPath.row - 1) / 2)] stringValue]];
-            
             cell.close.hidden = NO;
             cell.report.hidden = NO;
             
@@ -247,7 +249,7 @@
     
     
     NSString *reportTitle = [NSString stringWithFormat:@"Report To %@", [policeForces objectAtIndex:pos]];
-    [alert showCustom:self image:[UIImage imageNamed:@"git"] color:[UIColor colorWithRed:((float)66 / 255.0f) green:((float)133 / 255.0f) blue:((float)244 / 255.0f) alpha:1.0f] title:reportTitle subTitle:@"do not hesitate to report any suspicous behavour" closeButtonTitle:@"Cancel" duration:0.0f];
+    [alert showCustom:self image:[UIImage imageNamed:@"256 EyeWitness Logo.png"] color:[UIColor colorWithRed:((float)66 / 255.0f) green:((float)133 / 255.0f) blue:((float)244 / 255.0f) alpha:1.0f] title:reportTitle subTitle:@"do not hesitate to report any suspicous behavour" closeButtonTitle:@"Cancel" duration:0.0f];
 }
 
 - (void)dismiss {
