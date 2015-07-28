@@ -30,7 +30,7 @@
     
     [self.view setBackgroundColor:[UIColor colorWithRed:((float)229 / 255.0f) green:((float)229 / 255.0f) blue:((float)229 / 255.0f) alpha:1.0f]];
     
-    [self retrieveData];
+    [self APICall];
     
     UIView *myBox  = [[UIView alloc] initWithFrame:CGRectMake(0, 20, self.view.bounds.size.width, 60)];
     myBox.backgroundColor = [UIColor colorWithRed:((float)66 / 255.0f) green:((float)133 / 255.0f) blue:((float)244 / 255.0f) alpha:1.0f];
@@ -46,14 +46,20 @@
     
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     
-    self.locations = [[NSMutableArray alloc] init];
-    self.locationManager = [[CLLocationManager alloc] init];
-    self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-    self.locationManager.delegate = self;
-    [self.locationManager requestAlwaysAuthorization];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSData *data = [defaults objectForKey:@"locations"];
+    userLocations = [[NSMutableArray alloc] init];
+    userLocations = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     
-    self.locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
-    [self.locationManager startUpdatingLocation];
+    NSLog(@"Location Points: %lu", (unsigned long)userLocations.count);
+    
+    locationManager = [[CLLocationManager alloc] init];
+    locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    locationManager.delegate = self;
+    [locationManager requestAlwaysAuthorization];
+    
+    locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
+    [locationManager startUpdatingLocation];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -63,24 +69,25 @@
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
     
-    [self.locations addObject:newLocation];
-    
-    // Remove values if the array is too big
-    while (self.locations.count > 100) {
-        [self.locations removeObjectAtIndex:0];
-    }
+    locationIndex++;
     
     if (UIApplication.sharedApplication.applicationState == UIApplicationStateActive) {
-        NSLog(@"App is foreground. New location is %@", newLocation);
+        NSLog(@"App is foreground. New location is %f", newLocation.speed);
+        [userLocations addObject:newLocation];
     } else {
-        NSLog(@"App is backgrounded. New location is %@", newLocation);
+        NSLog(@"App is backgrounded. New location is %f", newLocation.speed);
+        [userLocations addObject:newLocation];
     }
-}
-
-- (void)retrieveData {
-    //Load Data From phone storage and call the APICall fnction with this data
     
-    [self APICall];
+    if (locationIndex > 10) {
+        NSUserDefaults *defualts = [NSUserDefaults standardUserDefaults];
+        NSData *data = [NSKeyedArchiver archivedDataWithRootObject:userLocations];
+        [defualts setObject:data forKey:@"locations"];
+        NSLog(@"Saving");
+        locationIndex = 0;
+        
+        NSLog(@"Location Points: %lu", (unsigned long)userLocations.count);
+    }
 }
 
 - (void)APICall {
@@ -129,13 +136,35 @@
 #pragma mark - tableview datasource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return ([titles count] * 2) + 1;
+    if (titles.count == 0) {
+        return 2;
+    } else {
+        return ([titles count] * 2) + 1;
+    }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     if (indexPath.row % 2) {
         static NSString *cellIndentifier = @"CardTableViewCell";
+        
+        if (titles.count == 0) {
+            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIndentifier];
+            if (cell == nil) {
+                cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIndentifier];
+            }
+            
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            
+            [cell addSubview:[self drawLabel:@"no current crimes require review" numberOfLines:1 textSize:32.0 position:CGRectMake(0, 0, self.view.bounds.size.width - 16, 100) align:NSTextAlignmentCenter backgroundColor:[UIColor whiteColor]]];
+            
+            cell.layer.masksToBounds = YES;
+            cell.layer.cornerRadius = 11;
+            
+            cell.clipsToBounds = YES;
+            
+            return cell;
+        }
         
         CardTableViewCell *cell = (CardTableViewCell *)[tableView dequeueReusableCellWithIdentifier:cellIndentifier];
         if (cell == nil) {
@@ -175,20 +204,6 @@
             cell.report.hidden = NO;
             
         } else {
-            /*GMSCameraPosition *camera = [GMSCameraPosition cameraWithLatitude:-33.868
-             longitude:151.2086
-             zoom:15];
-             GMSMapView *mapView = [GMSMapView mapWithFrame:cell.MapViewCircle.bounds camera:camera];
-             mapView.userInteractionEnabled = NO;
-             
-             
-             GMSMarker *marker = [[GMSMarker alloc] init];
-             marker.position = camera.target;
-             marker.appearAnimation = kGMSMarkerAnimationPop;
-             marker.map = mapView;
-             
-             [cell.MapViewCircle addSubview:mapView];*/
-            
             UIImageView *testImage =[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 150, 150)];
             testImage.image = [UIImage imageNamed:@"testImage.png"];
             [cell.MapViewCircle addSubview:testImage];
@@ -217,6 +232,8 @@
         if (cell == nil) {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
         }
+        
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
         
         [cell setBackgroundColor:[UIColor colorWithRed:((float)229 / 255.0f) green:((float)229 / 255.0f) blue:((float)229 / 255.0f) alpha:1.0f]];
         
@@ -314,6 +331,8 @@
         if (selectedIndex == indexPath.row) {
             NSLog(@"%f", (self.view.bounds.size.height - 80));
             return (self.view.bounds.size.height - 93);
+        } else if (titles.count == 0) {
+            return 100;
         } else {
             return 200;
         }
@@ -323,7 +342,7 @@
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.row % 2) {
+    if (indexPath.row % 2 && titles.count != 0) {
         if (selectedIndex == indexPath.row){
             selectedIndex = -1;
             [UIView setAnimationDuration:0.2];

@@ -21,11 +21,12 @@
     NSMutableArray *phoneNumbers;
     NSMutableArray *policeForces;
     
+    CLLocationManager *locationManager;
+    NSMutableArray *userLocations;
+    
+    int locationIndex;
     int selectedIndex;
 }
-
-@property (nonatomic, strong) CLLocationManager *locationManager;
-@property (nonatomic, strong) NSMutableArray *locations;
 
 @end
 
