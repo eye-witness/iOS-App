@@ -7,8 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+@import CoreLocation;
+@import MapKit;
 
-@interface ViewController : UIViewController <UITableViewDataSource, UITableViewDelegate> {
+@interface ViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, CLLocationManagerDelegate> {
     IBOutlet UITableView *cardTableView;
     NSMutableArray *titles;
     NSMutableArray *descriptions;
@@ -18,9 +20,12 @@
     NSMutableArray *latitude;
     NSMutableArray *phoneNumbers;
     NSMutableArray *policeForces;
+    
     int selectedIndex;
 }
 
+@property (nonatomic, strong) CLLocationManager *locationManager;
+@property (nonatomic, strong) NSMutableArray *locations;
 
 @end
 

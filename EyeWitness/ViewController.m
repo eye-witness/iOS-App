@@ -45,11 +45,36 @@
     [self.view addSubview:myBox2];
     
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+    
+    self.locations = [[NSMutableArray alloc] init];
+    self.locationManager = [[CLLocationManager alloc] init];
+    self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    self.locationManager.delegate = self;
+    [self.locationManager requestAlwaysAuthorization];
+    
+    self.locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
+    [self.locationManager startUpdatingLocation];
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
+    
+    [self.locations addObject:newLocation];
+    
+    // Remove values if the array is too big
+    while (self.locations.count > 100) {
+        [self.locations removeObjectAtIndex:0];
+    }
+    
+    if (UIApplication.sharedApplication.applicationState == UIApplicationStateActive) {
+        NSLog(@"App is foreground. New location is %@", newLocation);
+    } else {
+        NSLog(@"App is backgrounded. New location is %@", newLocation);
+    }
 }
 
 - (void)retrieveData {
