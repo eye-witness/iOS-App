@@ -13,6 +13,7 @@
 @interface ViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, CLLocationManagerDelegate> {
     IBOutlet UITableView *cardTableView;
     NSMutableArray *titles;
+    NSMutableArray *times;
     NSMutableArray *descriptions;
     NSMutableArray *locations;
     NSMutableArray *cellBackgroundColours;

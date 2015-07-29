@@ -69,24 +69,40 @@
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
     
-    locationIndex++;
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"ss"];
+    long timeSince = [[dateFormatter stringFromDate:newLocation.timestamp] integerValue] - [[dateFormatter stringFromDate:oldLocation.timestamp] integerValue];
     
-    if (UIApplication.sharedApplication.applicationState == UIApplicationStateActive) {
-        NSLog(@"App is foreground. New location is %f", newLocation.speed);
-        [userLocations addObject:newLocation];
+    if ([[dateFormatter stringFromDate:oldLocation.timestamp] integerValue] < [[dateFormatter stringFromDate:newLocation.timestamp] integerValue]) {
+        timeSince = [[dateFormatter stringFromDate:newLocation.timestamp] integerValue] - [[dateFormatter stringFromDate:oldLocation.timestamp] integerValue];
     } else {
-        NSLog(@"App is backgrounded. New location is %f", newLocation.speed);
-        [userLocations addObject:newLocation];
+        timeSince = [[dateFormatter stringFromDate:oldLocation.timestamp] integerValue] - [[dateFormatter stringFromDate:newLocation.timestamp] integerValue];
     }
     
-    if (locationIndex > 10) {
+    locationIndex += timeSince;
+    
+    if (locationIndex > 20) {
+        locationIndex = 0;
+        
+        [userLocations addObject:newLocation];
+        
         NSUserDefaults *defualts = [NSUserDefaults standardUserDefaults];
         NSData *data = [NSKeyedArchiver archivedDataWithRootObject:userLocations];
         [defualts setObject:data forKey:@"locations"];
         NSLog(@"Saving");
-        locationIndex = 0;
         
-        NSLog(@"Location Points: %lu", (unsigned long)userLocations.count);
+        int newAlerts = 5;
+        UILocalNotification *notify = [[UILocalNotification alloc] init];
+        NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+        NSDateComponents *dateComps = [calendar components: (NSHourCalendarUnit | NSMinuteCalendarUnit)
+                                                  fromDate: [NSDate date]];
+        NSDate *date = [calendar dateBySettingHour:[dateComps hour] minute:([dateComps minute] + 1) second:0 ofDate:[NSDate date] options:0];
+        notify.fireDate = date;
+        notify.alertBody = [NSString stringWithFormat:@"%d new crimes", newAlerts];
+        notify.alertAction = @"Test";
+        notify.category = @"e";
+        
+        [[UIApplication sharedApplication] scheduleLocalNotification:notify];
     }
 }
 
@@ -115,6 +131,7 @@
     latitude = [[NSMutableArray alloc] initWithCapacity:(values.count - 1)];
     policeForces = [[NSMutableArray alloc] initWithCapacity:(values.count - 1)];
     phoneNumbers = [[NSMutableArray alloc] initWithCapacity:(values.count - 1)];
+    times = [[NSMutableArray alloc] initWithCapacity:(values.count - 1)];
     
     for (int i = 0; i < (values.count); i++) {
         NSLog(@"%d: %@", i, values[i][@"description"][@"crimeType"]);
@@ -126,6 +143,7 @@
         [latitude insertObject:values[i][@"location"][@"lat"] atIndex:i];
         [policeForces insertObject:values[i][@"contact"][@"policeForce"] atIndex:i];
         [phoneNumbers insertObject:values[i][@"contact"][@"phoneNumber"] atIndex:i];
+        [times insertObject:values[i][@"time"] atIndex:i];
     }
     
     NSLog(@"eh");
@@ -156,7 +174,7 @@
             
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
             
-            [cell addSubview:[self drawLabel:@"no current crimes require review" numberOfLines:1 textSize:32.0 position:CGRectMake(0, 0, self.view.bounds.size.width - 16, 100) align:NSTextAlignmentCenter backgroundColor:[UIColor whiteColor]]];
+            [cell addSubview:[self drawLabel:@"No relevant appeals for information at this time" numberOfLines:2 textSize:32.0 position:CGRectMake(0, 0, self.view.bounds.size.width - 16, 100) align:NSTextAlignmentCenter backgroundColor:[UIColor whiteColor]]];
             
             cell.layer.masksToBounds = YES;
             cell.layer.cornerRadius = 11;
@@ -190,11 +208,15 @@
             cell.description.hidden = YES;
             cell.location.hidden = YES;
             
+            NSString *descriptionString = [NSString stringWithFormat:@" %@", [descriptions objectAtIndex:((indexPath.row - 1) / 2)]];
+            NSString *locationString = [locations objectAtIndex:((indexPath.row - 1) / 2)];
+            NSString *timeString = [NSString stringWithFormat:@" %@", [times objectAtIndex:((indexPath.row - 1) / 2)]];
+            
             [cell addSubview:[self drawLabel:[titles objectAtIndex:((indexPath.row - 1) / 2)] numberOfLines:1 textSize:32.0 position:CGRectMake(0, 300, self.view.bounds.size.width - 16, 44) align:NSTextAlignmentLeft backgroundColor:[UIColor whiteColor]]];
             
-            [cell addSubview:[self drawLabel:[locations objectAtIndex:((indexPath.row - 1) / 2)] numberOfLines:1 textSize:20.0 position:CGRectMake(0, 300, self.view.bounds.size.width - 16, 44) align:NSTextAlignmentRight backgroundColor:[UIColor clearColor]]];
+            [cell addSubview:[self drawLabel:locationString numberOfLines:1 textSize:20.0 position:CGRectMake(0, 300, self.view.bounds.size.width - 16, 44) align:NSTextAlignmentRight backgroundColor:[UIColor clearColor]]];
             
-            [cell addSubview:[self drawLabel:[descriptions objectAtIndex:((indexPath.row - 1) / 2)] numberOfLines:3 textSize:26.0 position:CGRectMake(0, 344, self.view.bounds.size.width - 16, 100) align:NSTextAlignmentLeft backgroundColor:[UIColor whiteColor]]];
+            [cell addSubview:[self drawLabel:descriptionString numberOfLines:3 textSize:26.0 position:CGRectMake(0, 344, self.view.bounds.size.width - 16, 100) align:NSTextAlignmentLeft backgroundColor:[UIColor whiteColor]]];
             
             [cell.report addTarget:self action:@selector(reportWithPosition) forControlEvents:UIControlEventTouchUpInside];
             
@@ -215,9 +237,21 @@
             cell.report.hidden = YES;
         }
         
-        cell.title.text = [titles objectAtIndex:((indexPath.row - 1) / 2)];
-        cell.description.text = [descriptions objectAtIndex:((indexPath.row - 1) / 2)];
-        cell.location.text = [locations objectAtIndex:((indexPath.row - 1) / 2)];
+        NSString *descriptionString = [NSString stringWithFormat:@" %@", [descriptions objectAtIndex:((indexPath.row - 1) / 2)]];
+        NSString *titleString = [NSString stringWithFormat:@" %@", [titles objectAtIndex:((indexPath.row - 1) / 2)]];
+        NSString *locationString = [locations objectAtIndex:((indexPath.row - 1) / 2)];
+        
+        NSTimeInterval seconds = [[times objectAtIndex:((indexPath.row - 1) / 2)] doubleValue];
+        NSDate *epochNSDate = [[NSDate alloc] initWithTimeIntervalSince1970:seconds];
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setTimeZone:[NSTimeZone localTimeZone]];
+        [dateFormatter setDateFormat:@"HH:mm EE dd-MMM"];
+        NSString *convertedTime = [dateFormatter stringFromDate:epochNSDate];
+        
+        cell.title.text = titleString;
+        cell.description.text = descriptionString;
+        cell.location.text = locationString;
+        cell.time.text = convertedTime;
         
         cell.layer.masksToBounds = YES;
         cell.layer.cornerRadius = 11;
@@ -334,7 +368,7 @@
         } else if (titles.count == 0) {
             return 100;
         } else {
-            return 200;
+            return 195;
         }
     } else {
         return 8;
