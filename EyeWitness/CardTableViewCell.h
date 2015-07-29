@@ -15,7 +15,9 @@
 @property (strong, nonatomic) IBOutlet UILabel *location;
 @property (strong, nonatomic) IBOutlet UILabel *time;
 
+@property (strong, nonatomic) IBOutlet UIButton *closeLabel;
 @property (strong, nonatomic) IBOutlet UIButton *close;
+@property (strong, nonatomic) IBOutlet UIButton *reportLabel;
 @property (strong, nonatomic) IBOutlet UIButton *report;
 
 @end

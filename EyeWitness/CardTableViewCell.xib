@@ -37,11 +37,10 @@
                         <color key="textColor" white="0.27000000000000002" alpha="1" colorSpace="calibratedWhite"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="C6F-ST-tiC">
-                        <rect key="frame" x="8" y="423" width="94" height="30"/>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="C6F-ST-tiC">
+                        <rect key="frame" x="16" y="375" width="50" height="50"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <fontDescription key="fontDescription" name="Roboto-Light" family="Roboto" pointSize="20"/>
-                        <state key="normal" title="Dismiss">
+                        <state key="normal" title="Dismiss" image="unnamed.png">
                             <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                         </state>
@@ -55,12 +54,20 @@
                         <color key="highlightedColor" white="0.17483038651315788" alpha="1" colorSpace="calibratedWhite"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Location" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="vU7-74-DaD">
-                        <rect key="frame" x="61.999999969482431" y="96" width="250" height="34"/>
+                        <rect key="frame" x="61.999999969482431" y="98" width="250" height="34"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                         <fontDescription key="fontDescription" name="Roboto-Light" family="Roboto" pointSize="14"/>
                         <color key="textColor" white="0.27000000000000002" alpha="1" colorSpace="calibratedWhite"/>
                         <color key="highlightedColor" white="0.26896587171052633" alpha="1" colorSpace="calibratedWhite"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Time" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="BjJ-j2-xX3">
+                        <rect key="frame" x="61.999999969482431" y="118" width="250" height="34"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" white="1" alpha="0.0" colorSpace="calibratedWhite"/>
+                        <fontDescription key="fontDescription" name="Roboto-Light" family="Roboto" pointSize="14"/>
+                        <color key="textColor" white="0.27000000000000002" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="highlightedColor" white="0.26896587170000003" alpha="1" colorSpace="calibratedWhite"/>
                     </label>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="ef7-vY-CkP">
                         <rect key="frame" x="217.99999996948242" y="423" width="94" height="30"/>
@@ -71,29 +78,43 @@
                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                         </state>
                     </button>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Time" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="BjJ-j2-xX3">
-                        <rect key="frame" x="61.999999969482431" y="119" width="250" height="34"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
-                        <color key="backgroundColor" white="1" alpha="0.0" colorSpace="calibratedWhite"/>
-                        <fontDescription key="fontDescription" name="Roboto-Light" family="Roboto" pointSize="14"/>
-                        <color key="textColor" white="0.27000000000000002" alpha="1" colorSpace="calibratedWhite"/>
-                        <color key="highlightedColor" white="0.26896587170000003" alpha="1" colorSpace="calibratedWhite"/>
-                    </label>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="ybn-Fw-fdJ">
+                        <rect key="frame" x="8" y="423" width="78" height="30"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <fontDescription key="fontDescription" name="Roboto-Light" family="Roboto" pointSize="20"/>
+                        <state key="normal" title="Dismiss">
+                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
+                    </button>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="1Kb-aj-pm4">
+                        <rect key="frame" x="256" y="375" width="50" height="50"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                        <state key="normal" title="Button" image="unnamed (1).png">
+                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
+                    </button>
                 </subviews>
             </tableViewCellContentView>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <connections>
                 <outlet property="MapViewCircle" destination="JX6-Wv-LhV" id="Hna-PY-49C"/>
                 <outlet property="close" destination="C6F-ST-tiC" id="sVs-R4-x8S"/>
+                <outlet property="closeLabel" destination="ybn-Fw-fdJ" id="WMg-7g-C5W"/>
                 <outlet property="description" destination="0s9-pa-mwb" id="gAh-hf-4W8"/>
                 <outlet property="location" destination="vU7-74-DaD" id="yeI-LO-49V"/>
-                <outlet property="report" destination="ef7-vY-CkP" id="2re-cp-8qG"/>
+                <outlet property="report" destination="1Kb-aj-pm4" id="VrU-h5-x9p"/>
+                <outlet property="reportLabel" destination="ef7-vY-CkP" id="Mrp-8b-vsh"/>
                 <outlet property="time" destination="BjJ-j2-xX3" id="hWK-9S-AXr"/>
                 <outlet property="title" destination="CAf-fA-dak" id="xrr-Gb-h30"/>
             </connections>
             <point key="canvasLocation" x="351" y="378"/>
         </tableViewCell>
     </objects>
+    <resources>
+        <image name="unnamed (1).png" width="480" height="480"/>
+        <image name="unnamed.png" width="480" height="480"/>
+    </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

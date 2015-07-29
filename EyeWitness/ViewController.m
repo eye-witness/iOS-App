@@ -102,6 +102,8 @@
         notify.alertAction = @"Test";
         notify.category = @"e";
         
+        NSLog(@"Quantity Of Locations: %lu", (unsigned long)userLocations.count);
+        
         [UIApplication sharedApplication].applicationIconBadgeNumber = newAlerts;
         [[UIApplication sharedApplication] scheduleLocalNotification:notify];
     }
@@ -229,11 +231,15 @@
             [cell addSubview:[self drawLabel:convertedTime numberOfLines:1 textSize:14.0 position:CGRectMake(0, 320, self.view.bounds.size.width - 25, 44) align:NSTextAlignmentRight backgroundColor:[UIColor clearColor]]];
             
             [cell.report addTarget:self action:@selector(reportWithPosition) forControlEvents:UIControlEventTouchUpInside];
+            [cell.reportLabel addTarget:self action:@selector(reportWithPosition) forControlEvents:UIControlEventTouchUpInside];
             
             [cell.close addTarget:self action:@selector(dismiss) forControlEvents:UIControlEventTouchUpInside];
+            [cell.closeLabel addTarget:self action:@selector(dismiss) forControlEvents:UIControlEventTouchUpInside];
             
             cell.close.hidden = NO;
             cell.report.hidden = NO;
+            cell.closeLabel.hidden = NO;
+            cell.reportLabel.hidden = NO;
             
         } else {
             UIImageView *testImage =[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 150, 150)];
@@ -244,7 +250,9 @@
             [self setRoundedView:cell.MapViewCircle toDiameter:150.0];
             
             cell.close.hidden = YES;
+            cell.closeLabel.hidden = YES;
             cell.report.hidden = YES;
+            cell.reportLabel.hidden = YES;
         }
         
         NSString *descriptionString = [NSString stringWithFormat:@" %@", [descriptions objectAtIndex:((indexPath.row - 1) / 2)]];
