@@ -98,6 +98,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		05601E921B69702A00F38C83 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				05E522D41B67D4C100163C20 /* title.png */,
+				05E522D21B67CEB500163C20 /* 256 EyeWitness Logo.png */,
+				05FE99431B677A5D00B04586 /* testImage.png */,
+				05601E8E1B6928C900F38C83 /* unnamed.png */,
+				05601E901B69344000F38C83 /* unnamed (1).png */,
+			);
+			name = Images;
+			sourceTree = "<group>";
+		};
 		05E522C11B679B0800163C20 /* SCLAlertView */ = {
 			isa = PBXGroup;
 			children = (
@@ -164,11 +176,6 @@
 				A78D69141B66B9D600823E49 /* ViewController.h */,
 				A78D69151B66B9D600823E49 /* ViewController.m */,
 				A78D69171B66B9D600823E49 /* Main.storyboard */,
-				05E522D41B67D4C100163C20 /* title.png */,
-				05E522D21B67CEB500163C20 /* 256 EyeWitness Logo.png */,
-				05FE99431B677A5D00B04586 /* testImage.png */,
-				05601E8E1B6928C900F38C83 /* unnamed.png */,
-				05601E901B69344000F38C83 /* unnamed (1).png */,
 				05FE99421B675C0100B04586 /* Card */,
 				A78D691A1B66B9D600823E49 /* Images.xcassets */,
 				A78D691C1B66B9D600823E49 /* LaunchScreen.xib */,
@@ -180,6 +187,7 @@
 		A78D690D1B66B9D600823E49 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				05601E921B69702A00F38C83 /* Images */,
 				05E522C11B679B0800163C20 /* SCLAlertView */,
 				A78D690E1B66B9D600823E49 /* Info.plist */,
 				A78D690F1B66B9D600823E49 /* main.m */,

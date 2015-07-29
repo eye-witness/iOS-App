@@ -30,7 +30,7 @@
     
     [self.view setBackgroundColor:[UIColor colorWithRed:((float)229 / 255.0f) green:((float)229 / 255.0f) blue:((float)229 / 255.0f) alpha:1.0f]];
     
-    [self APICall];
+    [self dataForAPICall];
     
     UIView *myBox  = [[UIView alloc] initWithFrame:CGRectMake(0, 20, self.view.bounds.size.width, 60)];
     myBox.backgroundColor = [UIColor colorWithRed:((float)66 / 255.0f) green:((float)133 / 255.0f) blue:((float)244 / 255.0f) alpha:1.0f];
@@ -46,10 +46,12 @@
     
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSData *data = [defaults objectForKey:@"locations"];
+    /*      CODE RESETS SAVED DATA
+     
     userLocations = [[NSMutableArray alloc] init];
-    userLocations = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    NSUserDefaults *defualts = [NSUserDefaults standardUserDefaults];
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:userLocations];
+    [defualts setObject:data forKey:@"locations"];*/
     
     NSLog(@"Location Points: %lu", (unsigned long)userLocations.count);
     
@@ -65,6 +67,63 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)dataForAPICall {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSData *data = [defaults objectForKey:@"locations"];
+    userLocations = [[NSMutableArray alloc] init];
+    userLocations = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    
+    titles = [[NSMutableArray alloc] init];
+    descriptions = [[NSMutableArray alloc] init];
+    locations = [[NSMutableArray alloc] init];
+    cellBackgroundColours = [[NSMutableArray alloc] init];
+    longitude = [[NSMutableArray alloc] init];
+    latitude = [[NSMutableArray alloc] init];
+    policeForces = [[NSMutableArray alloc] init];
+    phoneNumbers = [[NSMutableArray alloc] init];
+    times = [[NSMutableArray alloc] init];
+    
+    for (int i = 0; i < 1; i++) {     //replace 1 with userLocations.count
+        CLLocation *location = userLocations[i];
+        int TWOXLongitude = round(location.coordinate.longitude * 2);
+        int TWOXLatitude = round(location.coordinate.latitude * 2);
+        NSLog(@"long: %d lat: %d", TWOXLongitude, TWOXLatitude);
+        
+        NSArray *APIData = [self APICallWithLongitude:TWOXLongitude andLatitude:TWOXLatitude];
+        
+        for (int i = 0; i < APIData.count; i++) {
+            //check if the data is relevant and wich relevance stage before adding
+            NSLog(@"%d: %@", i, APIData[i][@"description"][@"crimeType"]);
+            [titles addObject:APIData[i][@"description"][@"crimeType"]];
+            [descriptions addObject:APIData[i][@"description"][@"text"]];
+            [locations addObject:APIData[i][@"description"][@"location"]];
+            [cellBackgroundColours addObject:@"1"];
+            [longitude addObject:APIData[i][@"location"][@"long"]];
+            [latitude addObject:APIData[i][@"location"][@"lat"]];
+            [policeForces addObject:APIData[i][@"contact"][@"policeForce"]];
+            [phoneNumbers addObject:APIData[i][@"contact"][@"phoneNumber"]];
+            [times addObject:APIData[i][@"time"]];
+        }
+    }
+    
+    [cardTableView reloadData];
+}
+
+- (NSArray *)APICallWithLongitude:(int)longitudeForAPI andLatitude:(int)latitudeForAPI {
+    
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
+    [request setURL:[NSURL URLWithString:@"https://gist.githubusercontent.com/michaelcullum/674c70d7f3b9d0c76af8/raw/5816df9f46d13187aacc2e2b88b8d9edb621b3a9/file.json"]];
+    [request setHTTPMethod:@"GET"];
+    NSURLResponse *requestResponse;
+    NSData *requestHandler = [NSURLConnection sendSynchronousRequest:request returningResponse:&requestResponse error:nil];
+    
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData: requestHandler options: NSJSONReadingMutableContainers error:nil];
+    
+    NSArray *values = json[@"cases"];
+    
+    return values;
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
@@ -91,67 +150,56 @@
         [defualts setObject:data forKey:@"locations"];
         NSLog(@"Saving");
         
-        int newAlerts = 5;
-        UILocalNotification *notify = [[UILocalNotification alloc] init];
-        NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-        NSDateComponents *dateComps = [calendar components: (NSHourCalendarUnit | NSMinuteCalendarUnit)
-                                                  fromDate: [NSDate date]];
-        NSDate *date = [calendar dateBySettingHour:[dateComps hour] minute:([dateComps minute] + 1) second:0 ofDate:[NSDate date] options:0];
-        notify.fireDate = date;
-        notify.alertBody = [NSString stringWithFormat:@"%d new crimes", newAlerts];
-        notify.alertAction = @"Test";
-        notify.category = @"e";
+        int TWOXLongitude = round(newLocation.coordinate.longitude * 2);
+        int TWOXLatitude = round(newLocation.coordinate.latitude * 2);
+        NSLog(@"long: %d lat: %d", TWOXLongitude, TWOXLatitude);
+        
+        NSArray *APIData = [self APICallWithLongitude:TWOXLongitude andLatitude:TWOXLatitude];
+        
+        int newAlerts = 0;
+        for (int i = 0; i < APIData.count; i++) {
+            //check if the data is relevant and wich relevance stage before adding
+            NSLog(@"%d: %@", i, APIData[i][@"description"][@"crimeType"]);
+            [titles addObject:APIData[i][@"description"][@"crimeType"]];
+            [descriptions addObject:APIData[i][@"description"][@"text"]];
+            [locations addObject:APIData[i][@"description"][@"location"]];
+            [cellBackgroundColours addObject:@"1"];
+            [longitude addObject:APIData[i][@"location"][@"long"]];
+            [latitude addObject:APIData[i][@"location"][@"lat"]];
+            [policeForces addObject:APIData[i][@"contact"][@"policeForce"]];
+            [phoneNumbers addObject:APIData[i][@"contact"][@"phoneNumber"]];
+            [times addObject:APIData[i][@"time"]];
+            
+            newAlerts++;
+        }
+        
+        if (newAlerts > 0) {
+            if (UIApplication.sharedApplication.applicationState == UIApplicationStateActive) {
+                [cardTableView reloadData];
+            } else {
+                UILocalNotification *notify = [[UILocalNotification alloc] init];
+                NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+                NSDateComponents *dateComps = [calendar components: (NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate: [NSDate date]];
+                
+                NSDate *date;
+                if ([dateComps second] > 30) {
+                    date = [calendar dateBySettingHour:[dateComps hour] minute:([dateComps minute] + 1) second:[dateComps second] ofDate:[NSDate date] options:0];
+                } else {
+                    date = [calendar dateBySettingHour:[dateComps hour] minute:[dateComps minute] second:([dateComps second] + 20) ofDate:[NSDate date] options:0];
+                }
+                
+                notify.fireDate = date;
+                notify.alertBody = [NSString stringWithFormat:@"%d new crimes", newAlerts];
+                notify.alertAction = @"Test";
+                notify.category = @"e";
+                
+                [UIApplication sharedApplication].applicationIconBadgeNumber = newAlerts;
+                [[UIApplication sharedApplication] scheduleLocalNotification:notify];
+            }
+        }
         
         NSLog(@"Quantity Of Locations: %lu", (unsigned long)userLocations.count);
-        
-        [UIApplication sharedApplication].applicationIconBadgeNumber = newAlerts;
-        [[UIApplication sharedApplication] scheduleLocalNotification:notify];
     }
-}
-
-- (void)APICall {
-    //API Call
-    
-    //Parse API Data
-    
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
-    [request setURL:[NSURL URLWithString:@"https://gist.githubusercontent.com/michaelcullum/674c70d7f3b9d0c76af8/raw/5816df9f46d13187aacc2e2b88b8d9edb621b3a9/file.json"]];
-    [request setHTTPMethod:@"GET"];
-    NSURLResponse *requestResponse;
-    NSData *requestHandler = [NSURLConnection sendSynchronousRequest:request returningResponse:&requestResponse error:nil];
-    
-    NSDictionary *json = [NSJSONSerialization JSONObjectWithData: requestHandler options: NSJSONReadingMutableContainers error:nil];
-    
-    NSArray *values = json[@"cases"];
-    
-    NSLog(@"%@", values[0][@"caseID"]);
-    
-    titles = [[NSMutableArray alloc] initWithCapacity:(values.count - 1)];
-    descriptions = [[NSMutableArray alloc] initWithCapacity:(values.count - 1)];
-    locations = [[NSMutableArray alloc] initWithCapacity:(values.count - 1)];
-    cellBackgroundColours = [[NSMutableArray alloc] initWithCapacity:(values.count - 1)];
-    longitude = [[NSMutableArray alloc] initWithCapacity:(values.count - 1)];
-    latitude = [[NSMutableArray alloc] initWithCapacity:(values.count - 1)];
-    policeForces = [[NSMutableArray alloc] initWithCapacity:(values.count - 1)];
-    phoneNumbers = [[NSMutableArray alloc] initWithCapacity:(values.count - 1)];
-    times = [[NSMutableArray alloc] initWithCapacity:(values.count - 1)];
-    
-    for (int i = 0; i < (values.count); i++) {
-        NSLog(@"%d: %@", i, values[i][@"description"][@"crimeType"]);
-        [titles insertObject:values[i][@"description"][@"crimeType"] atIndex:i];
-        [descriptions insertObject:values[i][@"description"][@"text"] atIndex:i];
-        [locations insertObject:values[i][@"description"][@"location"] atIndex:i];
-        [cellBackgroundColours insertObject:@"1" atIndex:i];
-        [longitude insertObject:values[i][@"location"][@"long"] atIndex:i];
-        [latitude insertObject:values[i][@"location"][@"lat"] atIndex:i];
-        [policeForces insertObject:values[i][@"contact"][@"policeForce"] atIndex:i];
-        [phoneNumbers insertObject:values[i][@"contact"][@"phoneNumber"] atIndex:i];
-        [times insertObject:values[i][@"time"] atIndex:i];
-    }
-    
-    NSLog(@"eh");
-    
-    [cardTableView reloadData];
 }
 
 #pragma mark - tableview datasource
