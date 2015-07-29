@@ -102,6 +102,7 @@
         notify.alertAction = @"Test";
         notify.category = @"e";
         
+        [UIApplication sharedApplication].applicationIconBadgeNumber = newAlerts;
         [[UIApplication sharedApplication] scheduleLocalNotification:notify];
     }
 }
@@ -210,13 +211,22 @@
             
             NSString *descriptionString = [NSString stringWithFormat:@" %@", [descriptions objectAtIndex:((indexPath.row - 1) / 2)]];
             NSString *locationString = [locations objectAtIndex:((indexPath.row - 1) / 2)];
-            NSString *timeString = [NSString stringWithFormat:@" %@", [times objectAtIndex:((indexPath.row - 1) / 2)]];
+            NSString *titleString = [NSString stringWithFormat:@" %@", [titles objectAtIndex:((indexPath.row - 1) / 2)]];
             
-            [cell addSubview:[self drawLabel:[titles objectAtIndex:((indexPath.row - 1) / 2)] numberOfLines:1 textSize:32.0 position:CGRectMake(0, 300, self.view.bounds.size.width - 16, 44) align:NSTextAlignmentLeft backgroundColor:[UIColor whiteColor]]];
+            NSTimeInterval seconds = [[times objectAtIndex:((indexPath.row - 1) / 2)] doubleValue];
+            NSDate *epochNSDate = [[NSDate alloc] initWithTimeIntervalSince1970:seconds];
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            [dateFormatter setTimeZone:[NSTimeZone localTimeZone]];
+            [dateFormatter setDateFormat:@"HH:mm EE dd-MMM"];
+            NSString *convertedTime = [dateFormatter stringFromDate:epochNSDate];
             
-            [cell addSubview:[self drawLabel:locationString numberOfLines:1 textSize:20.0 position:CGRectMake(0, 300, self.view.bounds.size.width - 16, 44) align:NSTextAlignmentRight backgroundColor:[UIColor clearColor]]];
+            [cell addSubview:[self drawLabel:titleString numberOfLines:1 textSize:32.0 position:CGRectMake(0, 300, self.view.bounds.size.width - 16, 44) align:NSTextAlignmentLeft backgroundColor:[UIColor whiteColor]]];
             
             [cell addSubview:[self drawLabel:descriptionString numberOfLines:3 textSize:26.0 position:CGRectMake(0, 344, self.view.bounds.size.width - 16, 100) align:NSTextAlignmentLeft backgroundColor:[UIColor whiteColor]]];
+            
+            [cell addSubview:[self drawLabel:locationString numberOfLines:1 textSize:14.0 position:CGRectMake(0, 290, self.view.bounds.size.width - 25, 44) align:NSTextAlignmentRight backgroundColor:[UIColor clearColor]]];
+            
+            [cell addSubview:[self drawLabel:convertedTime numberOfLines:1 textSize:14.0 position:CGRectMake(0, 320, self.view.bounds.size.width - 25, 44) align:NSTextAlignmentRight backgroundColor:[UIColor clearColor]]];
             
             [cell.report addTarget:self action:@selector(reportWithPosition) forControlEvents:UIControlEventTouchUpInside];
             
