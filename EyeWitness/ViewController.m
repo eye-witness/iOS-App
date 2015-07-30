@@ -30,6 +30,22 @@
     
     [self.view setBackgroundColor:[UIColor colorWithRed:((float)229 / 255.0f) green:((float)229 / 255.0f) blue:((float)229 / 255.0f) alpha:1.0f]];
     
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSData *data = [defaults objectForKey:@"locations"];
+    userLocations = [[NSMutableArray alloc] init];
+    userLocations = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    
+    titles = [[NSMutableArray alloc] init];
+    descriptions = [[NSMutableArray alloc] init];
+    locations = [[NSMutableArray alloc] init];
+    cellBackgroundColours = [[NSMutableArray alloc] init];
+    longitude = [[NSMutableArray alloc] init];
+    latitude = [[NSMutableArray alloc] init];
+    policeForces = [[NSMutableArray alloc] init];
+    phoneNumbers = [[NSMutableArray alloc] init];
+    times = [[NSMutableArray alloc] init];
+    
     [self dataForAPICall];
     
     UIView *myBox  = [[UIView alloc] initWithFrame:CGRectMake(0, 20, self.view.bounds.size.width, 60)];
@@ -70,20 +86,7 @@
 }
 
 - (void)dataForAPICall {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSData *data = [defaults objectForKey:@"locations"];
-    userLocations = [[NSMutableArray alloc] init];
-    userLocations = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-    
-    titles = [[NSMutableArray alloc] init];
-    descriptions = [[NSMutableArray alloc] init];
-    locations = [[NSMutableArray alloc] init];
-    cellBackgroundColours = [[NSMutableArray alloc] init];
-    longitude = [[NSMutableArray alloc] init];
-    latitude = [[NSMutableArray alloc] init];
-    policeForces = [[NSMutableArray alloc] init];
-    phoneNumbers = [[NSMutableArray alloc] init];
-    times = [[NSMutableArray alloc] init];
+    int newAlerts = 0;
     
     for (int i = 0; i < 1; i++) {     //replace 1 with userLocations.count
         CLLocation *location = userLocations[i];
@@ -105,10 +108,35 @@
             [policeForces addObject:APIData[i][@"contact"][@"policeForce"]];
             [phoneNumbers addObject:APIData[i][@"contact"][@"phoneNumber"]];
             [times addObject:APIData[i][@"time"]];
+            
+            newAlerts++;
         }
     }
     
-    [cardTableView reloadData];
+    if (newAlerts > 0) {
+        if (UIApplication.sharedApplication.applicationState == UIApplicationStateActive) {
+            [cardTableView reloadData];
+        } else {
+            UILocalNotification *notify = [[UILocalNotification alloc] init];
+            NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+            NSDateComponents *dateComps = [calendar components: (NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate: [NSDate date]];
+            
+            NSDate *date;
+            if ([dateComps second] > 30) {
+                date = [calendar dateBySettingHour:[dateComps hour] minute:([dateComps minute] + 1) second:[dateComps second] ofDate:[NSDate date] options:0];
+            } else {
+                date = [calendar dateBySettingHour:[dateComps hour] minute:[dateComps minute] second:([dateComps second] + 20) ofDate:[NSDate date] options:0];
+            }
+            
+            notify.fireDate = date;
+            notify.alertBody = [NSString stringWithFormat:@"%d new crimes", newAlerts];
+            notify.alertAction = @"Test";
+            notify.category = @"e";
+            
+            [UIApplication sharedApplication].applicationIconBadgeNumber = newAlerts;
+            [[UIApplication sharedApplication] scheduleLocalNotification:notify];
+        }
+    }
 }
 
 - (NSArray *)APICallWithLongitude:(int)longitudeForAPI andLatitude:(int)latitudeForAPI {
@@ -150,53 +178,7 @@
         [defualts setObject:data forKey:@"locations"];
         NSLog(@"Saving");
         
-        int TWOXLongitude = round(newLocation.coordinate.longitude * 2);
-        int TWOXLatitude = round(newLocation.coordinate.latitude * 2);
-        NSLog(@"long: %d lat: %d", TWOXLongitude, TWOXLatitude);
-        
-        NSArray *APIData = [self APICallWithLongitude:TWOXLongitude andLatitude:TWOXLatitude];
-        
-        int newAlerts = 0;
-        for (int i = 0; i < APIData.count; i++) {
-            //check if the data is relevant and wich relevance stage before adding
-            NSLog(@"%d: %@", i, APIData[i][@"description"][@"crimeType"]);
-            [titles addObject:APIData[i][@"description"][@"crimeType"]];
-            [descriptions addObject:APIData[i][@"description"][@"text"]];
-            [locations addObject:APIData[i][@"description"][@"location"]];
-            [cellBackgroundColours addObject:@"1"];
-            [longitude addObject:APIData[i][@"location"][@"long"]];
-            [latitude addObject:APIData[i][@"location"][@"lat"]];
-            [policeForces addObject:APIData[i][@"contact"][@"policeForce"]];
-            [phoneNumbers addObject:APIData[i][@"contact"][@"phoneNumber"]];
-            [times addObject:APIData[i][@"time"]];
-            
-            newAlerts++;
-        }
-        
-        if (newAlerts > 0) {
-            if (UIApplication.sharedApplication.applicationState == UIApplicationStateActive) {
-                [cardTableView reloadData];
-            } else {
-                UILocalNotification *notify = [[UILocalNotification alloc] init];
-                NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-                NSDateComponents *dateComps = [calendar components: (NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate: [NSDate date]];
-                
-                NSDate *date;
-                if ([dateComps second] > 30) {
-                    date = [calendar dateBySettingHour:[dateComps hour] minute:([dateComps minute] + 1) second:[dateComps second] ofDate:[NSDate date] options:0];
-                } else {
-                    date = [calendar dateBySettingHour:[dateComps hour] minute:[dateComps minute] second:([dateComps second] + 20) ofDate:[NSDate date] options:0];
-                }
-                
-                notify.fireDate = date;
-                notify.alertBody = [NSString stringWithFormat:@"%d new crimes", newAlerts];
-                notify.alertAction = @"Test";
-                notify.category = @"e";
-                
-                [UIApplication sharedApplication].applicationIconBadgeNumber = newAlerts;
-                [[UIApplication sharedApplication] scheduleLocalNotification:notify];
-            }
-        }
+        [self dataForAPICall];
         
         NSLog(@"Quantity Of Locations: %lu", (unsigned long)userLocations.count);
     }
