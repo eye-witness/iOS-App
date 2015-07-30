@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		05601E8F1B6928C900F38C83 /* unnamed.png in Resources */ = {isa = PBXBuildFile; fileRef = 05601E8E1B6928C900F38C83 /* unnamed.png */; };
 		05601E951B6A391F00F38C83 /* unnamed (1).png in Resources */ = {isa = PBXBuildFile; fileRef = 05601E941B6A391F00F38C83 /* unnamed (1).png */; };
+		05601E971B6A506200F38C83 /* refresh.png in Resources */ = {isa = PBXBuildFile; fileRef = 05601E961B6A506200F38C83 /* refresh.png */; };
+		05601E991B6A5C5F00F38C83 /* WitnessTitle.png in Resources */ = {isa = PBXBuildFile; fileRef = 05601E981B6A5C5F00F38C83 /* WitnessTitle.png */; };
 		05E522CD1B679B2000163C20 /* SCLAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 05E522C31B679B2000163C20 /* SCLAlertView.m */; };
 		05E522CE1B679B2000163C20 /* SCLAlertViewResponder.m in Sources */ = {isa = PBXBuildFile; fileRef = 05E522C51B679B2000163C20 /* SCLAlertViewResponder.m */; };
 		05E522CF1B679B2000163C20 /* SCLAlertViewStyleKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 05E522C71B679B2000163C20 /* SCLAlertViewStyleKit.m */; };
@@ -43,6 +45,8 @@
 /* Begin PBXFileReference section */
 		05601E8E1B6928C900F38C83 /* unnamed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = unnamed.png; sourceTree = "<group>"; };
 		05601E941B6A391F00F38C83 /* unnamed (1).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "unnamed (1).png"; sourceTree = "<group>"; };
+		05601E961B6A506200F38C83 /* refresh.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = refresh.png; sourceTree = "<group>"; };
+		05601E981B6A5C5F00F38C83 /* WitnessTitle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = WitnessTitle.png; sourceTree = "<group>"; };
 		05E522C21B679B2000163C20 /* SCLAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCLAlertView.h; sourceTree = "<group>"; };
 		05E522C31B679B2000163C20 /* SCLAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCLAlertView.m; sourceTree = "<group>"; };
 		05E522C41B679B2000163C20 /* SCLAlertViewResponder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCLAlertViewResponder.h; sourceTree = "<group>"; };
@@ -101,6 +105,8 @@
 		05601E921B69702A00F38C83 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				05601E981B6A5C5F00F38C83 /* WitnessTitle.png */,
+				05601E961B6A506200F38C83 /* refresh.png */,
 				05E522D41B67D4C100163C20 /* title.png */,
 				05E522D21B67CEB500163C20 /* 256 EyeWitness Logo.png */,
 				05FE99431B677A5D00B04586 /* testImage.png */,
@@ -302,11 +308,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				05601E971B6A506200F38C83 /* refresh.png in Resources */,
 				A78D69191B66B9D600823E49 /* Main.storyboard in Resources */,
 				A78D691E1B66B9D600823E49 /* LaunchScreen.xib in Resources */,
 				05601E8F1B6928C900F38C83 /* unnamed.png in Resources */,
 				05FE99401B675BFB00B04586 /* CardTableViewCell.xib in Resources */,
 				05FE99441B677A5D00B04586 /* testImage.png in Resources */,
+				05601E991B6A5C5F00F38C83 /* WitnessTitle.png in Resources */,
 				05601E951B6A391F00F38C83 /* unnamed (1).png in Resources */,
 				05E522D31B67CEB500163C20 /* 256 EyeWitness Logo.png in Resources */,
 				A78D691B1B66B9D600823E49 /* Images.xcassets in Resources */,

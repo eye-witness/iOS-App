@@ -12,6 +12,7 @@
 
 @interface ViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, CLLocationManagerDelegate> {
     IBOutlet UITableView *cardTableView;
+    
     NSMutableArray *titles;
     NSMutableArray *times;
     NSMutableArray *descriptions;
@@ -22,11 +23,14 @@
     NSMutableArray *phoneNumbers;
     NSMutableArray *policeForces;
     
+    int lastUpdate;
+    
     CLLocationManager *locationManager;
     NSMutableArray *userLocations;
     
     int locationIndex;
     int selectedIndex;
+    int timeClock;
 }
 
 @end

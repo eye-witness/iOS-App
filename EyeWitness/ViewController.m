@@ -52,22 +52,24 @@
     myBox.backgroundColor = [UIColor colorWithRed:((float)66 / 255.0f) green:((float)133 / 255.0f) blue:((float)244 / 255.0f) alpha:1.0f];
     [self.view addSubview:myBox];
     
-    UIImageView *EyeWitnessLogo256 = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.bounds.size.width / 2) - 160, 10, 320, 40)];
-    EyeWitnessLogo256.image = [UIImage imageNamed:@"title.png"];
+    UIImageView *EyeWitnessLogo256 = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.bounds.size.width / 2) - 160, 5, 320, 50)];
+    EyeWitnessLogo256.image = [UIImage imageNamed:@"WitnessTitle.png"];
     [myBox addSubview:EyeWitnessLogo256];
+    
+    UIButton *RefreshButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [RefreshButton addTarget:self action:@selector(dataForAPICall) forControlEvents:UIControlEventTouchUpInside];
+    [RefreshButton setTitle:@"" forState:UIControlStateNormal];
+    [RefreshButton setImage:[UIImage imageNamed:@"refresh.png"] forState:UIControlStateNormal];
+    RefreshButton.frame = CGRectMake((self.view.bounds.size.width - 40), 18, 25, 25);
+    RefreshButton.alpha = 1.0;
+    RefreshButton.highlighted = NO;
+    [myBox addSubview:RefreshButton];
     
     UIView *myBox2  = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 20)];
     myBox2.backgroundColor = [UIColor colorWithRed:((float)51 / 255.0f) green:((float)103 / 255.0f) blue:((float)214 / 255.0f) alpha:1.0f];
     [self.view addSubview:myBox2];
     
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
-    
-    /*      CODE RESETS SAVED DATA
-     
-    userLocations = [[NSMutableArray alloc] init];
-    NSUserDefaults *defualts = [NSUserDefaults standardUserDefaults];
-    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:userLocations];
-    [defualts setObject:data forKey:@"locations"];*/
     
     NSLog(@"Location Points: %lu", (unsigned long)userLocations.count);
     
@@ -90,13 +92,15 @@
     
     NSMutableArray *coordinates = [[NSMutableArray alloc] init];
     
+    NSLog(@"one");
+    
     for (int i = 0; i < 1; i++) {       //replace 1 with userLocations.count
         CLLocation *location = userLocations[i];
         float TWOXLongitude = location.coordinate.longitude * 2;
         float TWOXLatitude = location.coordinate.latitude * 2;
         
         int TWOXLongitudeCeil = ceil(TWOXLongitude);
-        int TWOXLatitudeCeil = ceil(TWOXLatitude);
+        int TWOXLatitudeCeil = floor(TWOXLatitude);
         
         NSCalendar *calendar = [NSCalendar currentCalendar];
         NSDateComponents *comps = [calendar components: NSEraCalendarUnit|NSYearCalendarUnit| NSMonthCalendarUnit|NSDayCalendarUnit|NSHourCalendarUnit fromDate: location.timestamp];
@@ -179,8 +183,6 @@
         
     }
     
-    NSLog(@"COORDS: %@", coordinates);
-    
     NSOrderedSet *orderedSet = [NSOrderedSet orderedSetWithArray:coordinates];
     NSArray *LocationsWithOutDupes = [orderedSet array];
     
@@ -197,11 +199,10 @@
     NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     NSLog(@"Dictionary: %@", jsonString);
     
+    //NSArray *locationDataWithTime = LocationsWithOutDupes[i];
+    NSArray *APIData = [self APICallWithDictionary:finalDict];
     
-    for (int i = 0; i < LocationsWithOutDupes.count; i++) {       //replace 1 with userLocations.count
-        
-        NSArray *locationDataWithTime = LocationsWithOutDupes[i];
-        NSArray *APIData = [self APICallWithDictionary:finalDict];
+    for (int i = 0; i < APIData.count; i++) {       //replace 1 with LocationsWithOutDupes.count
         
         for (int i = 0; i < APIData.count; i++) {
             //check if the data is relevant and wich relevance stage before adding
@@ -218,7 +219,6 @@
             
             newAlerts++;
         }
-        
     }
 
     
@@ -276,20 +276,27 @@
     }
     
     locationIndex += timeSince;
+    timeClock += timeSince;
+    
+    if (timeClock > 60) {       //3600
+        [self dataForAPICall];
+        
+        lastUpdate = [[NSDate date] timeIntervalSince1970];
+        NSLog(@"Seconds: %d", lastUpdate);
+        
+        timeClock = 0;
+    }
     
     if (locationIndex > 20) {
         locationIndex = 0;
         
+        //userLocations = [[NSMutableArray alloc] initWithObjects:newLocation, nil];
         [userLocations addObject:newLocation];
         
         NSUserDefaults *defualts = [NSUserDefaults standardUserDefaults];
         NSData *data = [NSKeyedArchiver archivedDataWithRootObject:userLocations];
         [defualts setObject:data forKey:@"locations"];
         NSLog(@"Saving");
-        
-        [self dataForAPICall];
-        
-        NSLog(@"Quantity Of Locations: %lu", (unsigned long)userLocations.count);
     }
 }
 
