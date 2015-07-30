@@ -35,6 +35,7 @@
     NSData *data = [defaults objectForKey:@"locations"];
     userLocations = [[NSMutableArray alloc] init];
     userLocations = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    lastUpdate = (int)[defaults objectForKey:@"lastUpdate"];
     
     titles = [[NSMutableArray alloc] init];
     descriptions = [[NSMutableArray alloc] init];
@@ -192,36 +193,68 @@
         [locationsData addObject:coordsDict];
     }
     
-    NSDictionary *finalDict = [NSDictionary dictionaryWithObjectsAndKeys:locationsData,@"blocks", nil];
+    NSMutableDictionary *finalDict = [[NSMutableDictionary alloc] init];
+    [finalDict setObject:locationsData forKey:@"blocks"];
+    NSNumber* lastUpdateNumber = [NSNumber numberWithInt:lastUpdate];
+    NSNumber* currentTimeNumber = [NSNumber numberWithInt:[[NSDate date] timeIntervalSince1970]];
+    [finalDict setObject:currentTimeNumber forKey:@"time"];
+    [finalDict setObject:lastUpdateNumber forKey:@"lastFetched"];
     
     NSError *error;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:finalDict options:NSJSONWritingPrettyPrinted error:&error];
     NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     NSLog(@"Dictionary: %@", jsonString);
     
-    //NSArray *locationDataWithTime = LocationsWithOutDupes[i];
-    NSArray *APIData = [self APICallWithDictionary:finalDict];
+    NSArray *APIData = [self APICallWithDictionary:jsonString];
     
-    for (int i = 0; i < APIData.count; i++) {       //replace 1 with LocationsWithOutDupes.count
-        
-        for (int i = 0; i < APIData.count; i++) {
-            //check if the data is relevant and wich relevance stage before adding
-            NSLog(@"%d: %@", i, APIData[i][@"description"][@"crimeType"]);
-            [titles addObject:APIData[i][@"description"][@"crimeType"]];
-            [descriptions addObject:APIData[i][@"description"][@"text"]];
-            [locations addObject:APIData[i][@"description"][@"location"]];
-            [cellBackgroundColours addObject:@"1"];
-            [longitude addObject:APIData[i][@"location"][@"long"]];
-            [latitude addObject:APIData[i][@"location"][@"lat"]];
-            [policeForces addObject:APIData[i][@"contact"][@"policeForce"]];
-            [phoneNumbers addObject:APIData[i][@"contact"][@"phoneNumber"]];
-            [times addObject:APIData[i][@"time"]];
+    for (int z = 0; z < (APIData.count - 1); z++) {
+        for (int i = 0; i < userLocations.count; i++) {
+            CLLocation *usersLocationAtPoint = userLocations[i];
+            int userTime = [usersLocationAtPoint.timestamp timeIntervalSince1970];
+            int crimeTime = (int)[APIData[z][@"time"] integerValue];
+            float userLong = usersLocationAtPoint.coordinate.longitude;
+            float crimeLong = [APIData[z][@"location"][@"long"] floatValue];
+            float userLat = usersLocationAtPoint.coordinate.latitude;
+            float crimeLat = [APIData[z][@"location"][@"lat"] floatValue];
             
-            newAlerts++;
+            bool addData = NO;
+            
+            if ((userTime < (crimeTime + 1800)) && (userTime > (crimeTime - 1800))) {
+                NSLog(@"In da house Close");
+                if ((userLong < (crimeLong + 0.001)) && (userLong > (crimeLong + 0.001))) {
+                    if ((userLat < (crimeLat + 0.001)) && (userLat > (crimeLat + 0.001))) {
+                        [cellBackgroundColours addObject:@"0"];
+                        addData = YES;
+                    } else if ((userLat < (crimeLat + 0.005)) && (userLat > (crimeLat + 0.005))) {
+                        [cellBackgroundColours addObject:@"1"];
+                        addData = YES;
+                    }
+                } else if ((userLong < (crimeLong + 0.005)) && (userLong > (crimeLong + 0.005))) {
+                    [cellBackgroundColours addObject:@"1"];
+                    addData = YES;
+                }
+            } else if ((userTime < (crimeTime + 10800)) && (userTime < (crimeTime - 10800))) {
+                [cellBackgroundColours addObject:@"1"];
+                addData = YES;
+            }
+            
+            if (addData == YES) {
+                [titles addObject:APIData[z][@"description"][@"crimeType"]];
+                [descriptions addObject:APIData[z][@"description"][@"text"]];
+                [locations addObject:APIData[z][@"description"][@"location"]];
+                [longitude addObject:APIData[z][@"location"][@"long"]];
+                [latitude addObject:APIData[z][@"location"][@"lat"]];
+                [policeForces addObject:APIData[z][@"contact"][@"policeForce"]];
+                [phoneNumbers addObject:APIData[z][@"contact"][@"phoneNumber"]];
+                [times addObject:APIData[z][@"time"]];
+                
+                newAlerts++;
+            }
+            
         }
     }
 
-    
+
     if (newAlerts > 0) {
         if (UIApplication.sharedApplication.applicationState == UIApplicationStateActive) {
             [cardTableView reloadData];
@@ -248,7 +281,11 @@
     }
 }
 
-- (NSArray *)APICallWithDictionary:(NSDictionary *)dataDictionary {
+- (NSArray *)APICallWithDictionary:(NSString *)dataDictionary {
+    
+    long length = dataDictionary.length;
+    
+    NSString *url = [NSString stringWithFormat:@"http://baseURL.com/api/appeals/application/json/application/json/%ld/%@", length, dataDictionary];
     
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
     [request setURL:[NSURL URLWithString:@"https://gist.githubusercontent.com/michaelcullum/674c70d7f3b9d0c76af8/raw/5816df9f46d13187aacc2e2b88b8d9edb621b3a9/file.json"]];
@@ -282,6 +319,9 @@
         [self dataForAPICall];
         
         lastUpdate = [[NSDate date] timeIntervalSince1970];
+        NSUserDefaults *defualts = [NSUserDefaults standardUserDefaults];
+        NSNumber *PREVupdate = [NSNumber numberWithInt:lastUpdate];
+        [defualts setObject:PREVupdate forKey:@"lastUpdate"];
         NSLog(@"Seconds: %d", lastUpdate);
         
         timeClock = 0;
@@ -477,10 +517,6 @@
         NSLog(@"Phone button tapped");
         NSString *tel = [NSString stringWithFormat:@"Tel:%@", [phoneNumbers objectAtIndex:pos]];
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:tel]];
-    }];
-    
-    [alert addButton:@"Email" actionBlock:^(void) {
-        NSLog(@"Email button tapped");
     }];
     
     alert.shouldDismissOnTapOutside = YES;
