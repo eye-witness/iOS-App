@@ -88,13 +88,120 @@
 - (void)dataForAPICall {
     int newAlerts = 0;
     
-    for (int i = 0; i < 1; i++) {     //replace 1 with userLocations.count
+    NSMutableArray *coordinates = [[NSMutableArray alloc] init];
+    
+    for (int i = 0; i < 1; i++) {       //replace 1 with userLocations.count
         CLLocation *location = userLocations[i];
-        int TWOXLongitude = round(location.coordinate.longitude * 2);
-        int TWOXLatitude = round(location.coordinate.latitude * 2);
-        NSLog(@"long: %d lat: %d", TWOXLongitude, TWOXLatitude);
+        float TWOXLongitude = location.coordinate.longitude * 2;
+        float TWOXLatitude = location.coordinate.latitude * 2;
         
-        NSArray *APIData = [self APICallWithLongitude:TWOXLongitude andLatitude:TWOXLatitude];
+        int TWOXLongitudeCeil = ceil(TWOXLongitude);
+        int TWOXLatitudeCeil = ceil(TWOXLatitude);
+        
+        NSCalendar *calendar = [NSCalendar currentCalendar];
+        NSDateComponents *comps = [calendar components: NSEraCalendarUnit|NSYearCalendarUnit| NSMonthCalendarUnit|NSDayCalendarUnit|NSHourCalendarUnit fromDate: location.timestamp];
+        [comps setHour: [comps hour]+1];
+        NSDate *coordsDate = [calendar dateFromComponents:comps];
+        
+        if (TWOXLongitudeCeil >= 0) {
+            if (TWOXLongitude < TWOXLongitudeCeil + 0.15) {
+                NSLog(@"Long 15 percent close a %f", TWOXLongitude);
+                NSNumber* TWOXLongitudeNumber = [NSNumber numberWithInt:(TWOXLongitudeCeil - 1)];
+                NSNumber* TWOXLatitudeNumber = [NSNumber numberWithInt:TWOXLatitudeCeil];
+                NSArray *coords = @[TWOXLongitudeNumber, TWOXLatitudeNumber, coordsDate];
+                [coordinates addObject:coords];
+            }
+            
+            if (TWOXLongitude > TWOXLongitudeCeil + 0.85) {
+                NSLog(@"Long 15 percent close b %f", TWOXLongitude);
+                NSNumber* TWOXLongitudeNumber = [NSNumber numberWithInt:(TWOXLongitudeCeil + 1)];
+                NSNumber* TWOXLatitudeNumber = [NSNumber numberWithInt:TWOXLatitudeCeil];
+                NSArray *coords = @[TWOXLongitudeNumber, TWOXLatitudeNumber, coordsDate];
+                [coordinates addObject:coords];
+            }
+        } else {
+            if (TWOXLongitude > TWOXLongitudeCeil - 0.15) {
+                NSLog(@"Long 15 percent close a %f", TWOXLongitude);
+                NSNumber* TWOXLongitudeNumber = [NSNumber numberWithInt:(TWOXLongitudeCeil - 1)];
+                NSNumber* TWOXLatitudeNumber = [NSNumber numberWithInt:TWOXLatitudeCeil];
+                NSArray *coords = @[TWOXLongitudeNumber, TWOXLatitudeNumber, coordsDate];
+                [coordinates addObject:coords];
+            }
+            
+            if (TWOXLongitude < TWOXLongitudeCeil - 0.85) {
+                NSLog(@"Long 15 percent close b %f", TWOXLongitude);
+                NSNumber* TWOXLongitudeNumber = [NSNumber numberWithInt:(TWOXLongitudeCeil + 1)];
+                NSNumber* TWOXLatitudeNumber = [NSNumber numberWithInt:TWOXLatitudeCeil];
+                NSArray *coords = @[TWOXLongitudeNumber, TWOXLatitudeNumber, coordsDate];
+                [coordinates addObject:coords];
+            }
+        }
+        
+        if (TWOXLatitudeCeil >= 0) {
+            if (TWOXLatitude < TWOXLatitudeCeil - 0.15) {
+                NSLog(@"Lat 15 percent close ca %f", TWOXLatitude);
+                NSNumber* TWOXLongitudeNumber = [NSNumber numberWithInt:TWOXLongitude];
+                NSNumber* TWOXLatitudeNumber = [NSNumber numberWithInt:(TWOXLatitudeCeil - 1)];
+                NSArray *coords = @[TWOXLongitudeNumber, TWOXLatitudeNumber, coordsDate];
+                [coordinates addObject:coords];
+            }
+            
+            if (TWOXLatitude > TWOXLatitudeCeil - 0.85) {
+                NSLog(@"Lat 15 percent close d %f", TWOXLatitude);
+                NSNumber* TWOXLongitudeNumber = [NSNumber numberWithInt:TWOXLongitude];
+                NSNumber* TWOXLatitudeNumber = [NSNumber numberWithInt:(TWOXLatitudeCeil + 1)];
+                NSArray *coords = @[TWOXLongitudeNumber, TWOXLatitudeNumber, coordsDate];
+                [coordinates addObject:coords];
+            }
+        } else {
+            if (TWOXLatitude > TWOXLatitudeCeil + 0.15) {
+                NSLog(@"Lat 15 percent close cb %f", TWOXLatitude);
+                NSNumber* TWOXLongitudeNumber = [NSNumber numberWithInt:TWOXLongitude];
+                NSNumber* TWOXLatitudeNumber = [NSNumber numberWithInt:(TWOXLatitudeCeil - 1)];
+                NSArray *coords = @[TWOXLongitudeNumber, TWOXLatitudeNumber, coordsDate];
+                [coordinates addObject:coords];
+            }
+            
+            if (TWOXLatitude < TWOXLatitudeCeil + 0.85) {
+                NSLog(@"Lat 15 percent close d %f", TWOXLatitude);
+                NSNumber* TWOXLongitudeNumber = [NSNumber numberWithInt:TWOXLongitude];
+                NSNumber* TWOXLatitudeNumber = [NSNumber numberWithInt:(TWOXLatitudeCeil + 1)];
+                NSArray *coords = @[TWOXLongitudeNumber, TWOXLatitudeNumber, coordsDate];
+                [coordinates addObject:coords];
+            }
+        }
+        
+        NSNumber* TWOXLongitudeNumber = [NSNumber numberWithInt:TWOXLongitude];
+        NSNumber* TWOXLatitudeNumber = [NSNumber numberWithInt:TWOXLatitude];
+        
+        NSArray *coords = @[TWOXLongitudeNumber, TWOXLatitudeNumber, coordsDate];
+        [coordinates addObject:coords];
+        
+    }
+    
+    NSLog(@"COORDS: %@", coordinates);
+    
+    NSOrderedSet *orderedSet = [NSOrderedSet orderedSetWithArray:coordinates];
+    NSArray *LocationsWithOutDupes = [orderedSet array];
+    
+    NSMutableArray *locationsData = [[NSMutableArray alloc] init];
+    for (int i = 0; i < LocationsWithOutDupes.count; i++) {
+        NSDictionary *coordsDict = [NSDictionary dictionaryWithObjectsAndKeys:LocationsWithOutDupes[i][1],@"lat",LocationsWithOutDupes[i][0],@"long", nil];
+        [locationsData addObject:coordsDict];
+    }
+    
+    NSDictionary *finalDict = [NSDictionary dictionaryWithObjectsAndKeys:locationsData,@"blocks", nil];
+    
+    NSError *error;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:finalDict options:NSJSONWritingPrettyPrinted error:&error];
+    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    NSLog(@"Dictionary: %@", jsonString);
+    
+    
+    for (int i = 0; i < LocationsWithOutDupes.count; i++) {       //replace 1 with userLocations.count
+        
+        NSArray *locationDataWithTime = LocationsWithOutDupes[i];
+        NSArray *APIData = [self APICallWithDictionary:finalDict];
         
         for (int i = 0; i < APIData.count; i++) {
             //check if the data is relevant and wich relevance stage before adding
@@ -111,7 +218,9 @@
             
             newAlerts++;
         }
+        
     }
+
     
     if (newAlerts > 0) {
         if (UIApplication.sharedApplication.applicationState == UIApplicationStateActive) {
@@ -139,7 +248,7 @@
     }
 }
 
-- (NSArray *)APICallWithLongitude:(int)longitudeForAPI andLatitude:(int)latitudeForAPI {
+- (NSArray *)APICallWithDictionary:(NSDictionary *)dataDictionary {
     
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
     [request setURL:[NSURL URLWithString:@"https://gist.githubusercontent.com/michaelcullum/674c70d7f3b9d0c76af8/raw/5816df9f46d13187aacc2e2b88b8d9edb621b3a9/file.json"]];
@@ -158,7 +267,7 @@
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"ss"];
-    long timeSince = [[dateFormatter stringFromDate:newLocation.timestamp] integerValue] - [[dateFormatter stringFromDate:oldLocation.timestamp] integerValue];
+    long timeSince;
     
     if ([[dateFormatter stringFromDate:oldLocation.timestamp] integerValue] < [[dateFormatter stringFromDate:newLocation.timestamp] integerValue]) {
         timeSince = [[dateFormatter stringFromDate:newLocation.timestamp] integerValue] - [[dateFormatter stringFromDate:oldLocation.timestamp] integerValue];
