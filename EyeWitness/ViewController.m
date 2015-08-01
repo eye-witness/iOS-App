@@ -316,10 +316,13 @@
     [request setHTTPBody:dataDictionary];
     [request setHTTPMethod:@"POST"];
     
+    NSMutableArray *dataToReturn = [[NSMutableArray alloc] init];
+    
     AFHTTPRequestOperation *op = [[AFHTTPRequestOperation alloc] initWithRequest:request];
     op.responseSerializer = [AFJSONResponseSerializer serializer];
     [op setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
         
+        [dataToReturn addObject:responseObject];
         NSLog(@"JSON responseObject: %@ ",responseObject);
         
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -328,19 +331,7 @@
     }];
     [op start];
     
-    /*
-    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
-    NSDictionary *parameters = @{};
-    [manager POST:url parameters:parameters constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
-        
-    } success:^(AFHTTPRequestOperation *operation, id responseObject) {
-        NSLog(@"Success: %@", responseObject);
-    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        NSLog(@"Error: %@", error);
-    }];
-     */
-    
-    return nil;
+    return dataToReturn;
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
