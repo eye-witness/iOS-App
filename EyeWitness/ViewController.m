@@ -11,6 +11,7 @@
 #import "CardTableViewCell.h"
 #import "SCLAlertView.h"
 @import GoogleMaps;
+#import "AFNetworking.h"
 
 @interface ViewController ()
 
@@ -74,13 +75,13 @@
     
     NSLog(@"Location Points: %lu", (unsigned long)userLocations.count);
     
-    locationManager = [[CLLocationManager alloc] init];
+    /*locationManager = [[CLLocationManager alloc] init];
     locationManager.desiredAccuracy = kCLLocationAccuracyBest;
     locationManager.delegate = self;
     [locationManager requestAlwaysAuthorization];
     
     locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
-    [locationManager startUpdatingLocation];
+    [locationManager startUpdatingLocation];*/
 }
 
 - (void)didReceiveMemoryWarning {
@@ -189,7 +190,7 @@
     
     NSMutableArray *locationsData = [[NSMutableArray alloc] init];
     for (int i = 0; i < LocationsWithOutDupes.count; i++) {
-        NSDictionary *coordsDict = [NSDictionary dictionaryWithObjectsAndKeys:LocationsWithOutDupes[i][1],@"lat",LocationsWithOutDupes[i][0],@"long", nil];
+        NSDictionary *coordsDict = [NSDictionary dictionaryWithObjectsAndKeys:LocationsWithOutDupes[i][1],@"latitude",LocationsWithOutDupes[i][0],@"longitude", nil];
         [locationsData addObject:coordsDict];
     }
     
@@ -205,7 +206,7 @@
     NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     NSLog(@"Dictionary: %@", jsonString);
     
-    NSArray *APIData = [self APICallWithDictionary:jsonString];
+    NSArray *APIData = [self APICallWithDictionary:jsonData];
     
     for (int z = 0; z < (APIData.count - 1); z++) {
         for (int i = 0; i < userLocations.count; i++) {
@@ -220,7 +221,6 @@
             bool addData = NO;
             
             if ((userTime < (crimeTime + 1800)) && (userTime > (crimeTime - 1800))) {
-                NSLog(@"In da house Close");
                 if ((userLong < (crimeLong + 0.001)) && (userLong > (crimeLong + 0.001))) {
                     if ((userLat < (crimeLat + 0.001)) && (userLat > (crimeLat + 0.001))) {
                         [cellBackgroundColours addObject:@"0"];
@@ -230,12 +230,18 @@
                         addData = YES;
                     }
                 } else if ((userLong < (crimeLong + 0.005)) && (userLong > (crimeLong + 0.005))) {
-                    [cellBackgroundColours addObject:@"1"];
-                    addData = YES;
+                    if ((userLat < (crimeLat + 0.005)) && (userLat > (crimeLat + 0.005))) {
+                        [cellBackgroundColours addObject:@"1"];
+                        addData = YES;
+                    }
                 }
             } else if ((userTime < (crimeTime + 10800)) && (userTime < (crimeTime - 10800))) {
-                [cellBackgroundColours addObject:@"1"];
-                addData = YES;
+                if ((userLong < (crimeLong + 0.005)) && (userLong > (crimeLong + 0.005))) {
+                    if ((userLat < (crimeLat + 0.005)) && (userLat > (crimeLat + 0.005))) {
+                        [cellBackgroundColours addObject:@"1"];
+                        addData = YES;
+                    }
+                }
             }
             
             if (addData == YES) {
@@ -256,6 +262,16 @@
 
 
     if (newAlerts > 0) {
+        
+        NSUserDefaults *defualts = [NSUserDefaults standardUserDefaults];
+        [defualts setObject:titles forKey:@"titlesArray"];
+        [defualts setObject:descriptions forKey:@"descriptionsArray"];
+        [defualts setObject:locations forKey:@"locationsArray"];
+        [defualts setObject:longitude forKey:@"longitudesArray"];
+        [defualts setObject:policeForces forKey:@"policeForcesArray"];
+        [defualts setObject:phoneNumbers forKey:@"phoneNumbersArray"];
+        [defualts setObject:times forKey:@"timesArray"];
+        
         if (UIApplication.sharedApplication.applicationState == UIApplicationStateActive) {
             [cardTableView reloadData];
         } else {
@@ -281,23 +297,50 @@
     }
 }
 
-- (NSArray *)APICallWithDictionary:(NSString *)dataDictionary {
+- (NSArray *)APICallWithDictionary:(NSData *)dataDictionary {
     
-    long length = dataDictionary.length;
+    NSString *length = [NSString stringWithFormat:@"%lu", (unsigned long)dataDictionary.length];
+    //  104.236.110.36
     
-    NSString *url = [NSString stringWithFormat:@"http://baseURL.com/api/appeals/application/json/application/json/%ld/%@", length, dataDictionary];
+    NSString *url = [NSString stringWithFormat:@"http://104.236.110.36/index.php/api/appeals/"];
     
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
-    [request setURL:[NSURL URLWithString:@"https://gist.githubusercontent.com/michaelcullum/674c70d7f3b9d0c76af8/raw/5816df9f46d13187aacc2e2b88b8d9edb621b3a9/file.json"]];
-    [request setHTTPMethod:@"GET"];
-    NSURLResponse *requestResponse;
-    NSData *requestHandler = [NSURLConnection sendSynchronousRequest:request returningResponse:&requestResponse error:nil];
+    // NSString *encodedURL = [url stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    // NSLog(@"%@", encodedURL);
     
-    NSDictionary *json = [NSJSONSerialization JSONObjectWithData: requestHandler options: NSJSONReadingMutableContainers error:nil];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:600.0f];
+    [request setURL:[NSURL URLWithString:url]];
     
-    NSArray *values = json[@"cases"];
+    [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
+    [request addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [request addValue:length forHTTPHeaderField:@"Content-Length"];
+    [request setHTTPBody:dataDictionary];
+    [request setHTTPMethod:@"POST"];
     
-    return values;
+    AFHTTPRequestOperation *op = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+    op.responseSerializer = [AFJSONResponseSerializer serializer];
+    [op setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+        
+        NSLog(@"JSON responseObject: %@ ",responseObject);
+        
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"Error: %@", [error localizedDescription]);
+        
+    }];
+    [op start];
+    
+    /*
+    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+    NSDictionary *parameters = @{};
+    [manager POST:url parameters:parameters constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+        
+    } success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        NSLog(@"Success: %@", responseObject);
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"Error: %@", error);
+    }];
+     */
+    
+    return nil;
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
@@ -315,7 +358,7 @@
     locationIndex += timeSince;
     timeClock += timeSince;
     
-    if (timeClock > 60) {       //3600
+    if (timeClock > 3600) {       //3600
         [self dataForAPICall];
         
         lastUpdate = [[NSDate date] timeIntervalSince1970];
@@ -326,6 +369,12 @@
         
         timeClock = 0;
     }
+    
+    /*[userLocations addObject:newLocation];
+    
+    NSUserDefaults *defualts = [NSUserDefaults standardUserDefaults];
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:userLocations];
+    [defualts setObject:data forKey:@"locations"];*/
     
     if (locationIndex > 20) {
         locationIndex = 0;

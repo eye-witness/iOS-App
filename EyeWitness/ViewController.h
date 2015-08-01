@@ -10,7 +10,7 @@
 @import CoreLocation;
 @import MapKit;
 
-@interface ViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, CLLocationManagerDelegate> {
+@interface ViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, CLLocationManagerDelegate, NSURLConnectionDelegate> {
     IBOutlet UITableView *cardTableView;
     
     NSMutableArray *titles;
@@ -32,6 +32,8 @@
     int selectedIndex;
     int timeClock;
 }
+
+@property (nonatomic, strong) NSURLConnection *connection;
 
 @end
 
